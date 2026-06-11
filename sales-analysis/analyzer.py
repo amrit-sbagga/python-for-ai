@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import json
 import os
+from helpers import calculate_total, format_currency
 
 # Check if we're in the right place
 print("Current directory:", os.getcwd())
@@ -24,9 +25,30 @@ print(df)
 print(f"\nShape: {df.shape[0]} rows, {df.shape[1]} columns")
 
 # Quick operation: calculate total for each row
-df['total'] = df['quantity'] * df['price']
-print("\nWith totals:")
-print(df)
+# df['total'] = calculate_total(df['quantity'], df['price'])
+# df['formatted_total'] = df['total'].apply(format_currency)
+# print("\nWith totals:")
+# print(df)
+
+# Calculate total for each row
+totals = []
+for index, row in df.iterrows():
+    total = calculate_total(row['quantity'], row['price'])
+    totals.append(total)
+
+# Add totals to our data
+df['total'] = totals
+
+# Display with formatted totals
+print("Sales Data:")
+for index, row in df.iterrows():
+    formatted_total = format_currency(row['total'])
+    print(f"{row['product']}: {formatted_total}")
+
+# Show grand total
+grand_total = df['total'].sum()
+formatted_grand_total = format_currency(grand_total)
+print(f"\nGrand Total: {formatted_grand_total}")
 
 # Create output directory
 os.makedirs('output', exist_ok=True)
